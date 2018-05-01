@@ -3,7 +3,14 @@ require 'asciidoctor-diagram'
 ASCIIDOCTOR_DECJS = './tmp/asciidoctor-deck.js'
 
 TEST_BUILD = './test_build'
-FileUtils.mkdir_p TEST_BUILD
+DECKJS_LINK = File.join(TEST_BUILD, 'deck.js')
+
+def self.cook_test_env
+  FileUtils.mkdir_p TEST_BUILD
+  FileUtils.ln_s '../deck.js', TEST_BUILD  unless File.exist?(DECKJS_LINK)
+end
+
+cook_test_env
 
 COMMON_ATTRIBUTES = {
       'lang' => 'ru',
@@ -59,7 +66,7 @@ def all_asciidoc
 end
 
 def lint(file)
-  #TODO: lint links
+  #TODO: checking links in documents
   file
 end
 
