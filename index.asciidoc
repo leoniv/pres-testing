@@ -1,0 +1,42 @@
+= Модульное(Unit) тестирование
+Leonid Vlasov
+
+== Slide One
+
+[cols=2*a]
+|===
+|Метод
+[source,ruby,numbered]
+----
+def foo(a)
+  if a <= 5 <1>
+    result = '( .. 5]' <2>
+  elsif a > 10 <3>
+    result = '(10 .. )' <4>
+  else <5>
+    result = '(5 .. 10]' <6>
+  end <7>
+
+  return result <8>
+end
+----
+|Граф управления
+[ditaa]
+....
+                   +-------------+
+                   | Asciidoctor |-------+
+                   |   diagram   |       |
+                   +-------------+       | PNG out
+                       ^                 |
+                       | ditaa in        |
+                       |                 v
+ +--------+   +--------+----+    /---------------\
+ |        | --+ Asciidoctor +--> |               |
+ |  Text  |   +-------------+    |   Beautiful   |
+ |Document|   |   !magic!   |    |    Output     |
+ |     {d}|   |             |    |               |
+ +---+----+   +-------------+    \---------------/
+     :                                   ^
+     |          Lots of work             |
+     +-----------------------------------+
+....
