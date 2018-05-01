@@ -6,12 +6,11 @@ DECKJS_LINK = File.join(TEST_BUILD, 'deck.js')
 IMAGES_DIR = File.expand_path('../images', __FILE__)
 CUSTOM_CSS = File.expand_path('../css/custom.css', __FILE__)
 
-def self.cook_test_env
+def cook_test_env
   FileUtils.mkdir_p TEST_BUILD
+  FileUtils.rm_rf(File.join(TEST_BUILD, '/*'));
   FileUtils.ln_s '../deck.js', TEST_BUILD  unless File.exist?(DECKJS_LINK)
 end
-
-cook_test_env
 
 COMMON_ATTRIBUTES = {
       'imagesdir' => IMAGES_DIR,
@@ -79,11 +78,13 @@ end
 
 desc 'Test build for [file.asciidoc]'
 task :test, :src do |t, args|
+  cook_test_env
   lint build(args[:src], TEST_BUILD)
 end
 
 desc 'Test build for all *.asciidoc files'
 task :test_all do
+  cook_test_env
   all_asciidoc.each do |file|
     lint build(file, TEST_BUILD)
   end
