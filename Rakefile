@@ -1,9 +1,10 @@
-require 'asciidoctor-diagram'
+require 'html-proofer'
 
 ASCIIDOCTOR_DECJS = './tmp/asciidoctor-deck.js'
-
 TEST_BUILD = './test_build'
 DECKJS_LINK = File.join(TEST_BUILD, 'deck.js')
+IMAGES_DIR = File.expand_path('../images', __FILE__)
+CUSTOM_CSS = File.expand_path('../css/custom.css', __FILE__)
 
 def self.cook_test_env
   FileUtils.mkdir_p TEST_BUILD
@@ -13,6 +14,8 @@ end
 cook_test_env
 
 COMMON_ATTRIBUTES = {
+      'imagesdir' => IMAGES_DIR,
+      'imagesoutdir' => IMAGES_DIR,
       'lang' => 'ru',
       'encoding' => 'utf-8',
       'author' => 'Leonid Vlasov',
@@ -24,7 +27,7 @@ COMMON_ATTRIBUTES = {
       'split' => nil,
       'source-highlighter' => 'coderay',
       'coderay-linenums-mode' => 'inline',
-      'customcss' => 'css/custom.css',
+      'customcss' => CUSTOM_CSS,
       'safe-mode-safe' => nil,
       'data-uri' => nil,
       'cache-uri' => nil}
@@ -39,7 +42,6 @@ def attr_to_cmd(attr)
     r << " -a #{a}#{v.nil? ? '' : "=#{v.gsub(' ', '\\ ')}"}"
   end
   r.join(' ')
-
 end
 
 def asciidoctor_deckjs
@@ -51,7 +53,7 @@ def asciidoctor_deckjs
 end
 
 def asciidoctor(src, dest_dir, attributes)
-  "asciidoctor -T #{asciidoctor_deckjs} #{attributes} #{src} -D #{dest_dir}"
+  "asciidoctor -r asciidoctor-diagram -T #{asciidoctor_deckjs} #{attributes} #{src} -D #{dest_dir}"
 end
 
 def build(src, dest_dir, attributes = common_attributes)
@@ -62,11 +64,11 @@ def build(src, dest_dir, attributes = common_attributes)
 end
 
 def all_asciidoc
-  Dir.glob('./src/*.asciidoc')
+  Dir.glob('./src/*.{asciidoc,adoc}')
 end
 
 def lint(file)
-  #TODO: checking links in documents
+  HTMLProofer.check_file(file).run
   file
 end
 
