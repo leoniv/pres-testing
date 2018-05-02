@@ -408,5 +408,131 @@ end
 
 == Нотации тестов
 
-FIXME test_ spec gerkin
+.*Классически тесты*
+[source, ruby, numbered]
+----
+class FooTest < Minitest::Test
+  def test_one
+    assert_equal 'Expected', 'Actual'
+  end
 
+  def test_two
+    assert_equal 'Expected', 'Actual'
+  end
+end
+----
+
+.Недостатки
+- сложность организации при большом количестве тестов
+- очень низкая информативнось
+
+<<<
+
+.*Spec нотация*
+
+Используется DSL описания спецификаций
+
+[source, ruby, numbered]
+----
+describe Foo do
+  describe '#bar' do
+    it 'when ...' do
+      'Actual'.wont_equal 'Expected'
+    end
+  end
+
+  describe '#buzz' do
+    it 'when ...' do
+      'Actual'.must_be :==, 'Actual'
+    end
+  end
+end
+----
+
+.*Преимущества*
+- гибкая организация тестов
+- хорошая информативность
+- можно использовать для документирования спецификаций кода
+
+<<<
+
+.https://cucumber.io/[Cucumber]
+Использовать Cucumber на данном уровне тестирования неправильно!
+
+Состоит из двух частей:
+
+- описание функционала на человеческом языке с использованием DSL
+https://github.com/cucumber/cucumber/wiki/Gherkin[Gherkin]
+- реализация шагов - тестов на языке программирования
+
+[cols=2*a, separator=;]
+|===
+;Gerkin
+[source, numbered]
+----
+Feature: Eating too many cucumbers may not be good for you
+
+  Eating too much of anything may not be good for you.
+
+  Scenario: Eating a few is no problem
+    Given Alice is hungry
+    When she eats 3 cucumbers
+    Then she will be full
+----
+;Реализация шагов
+[source, ruby, numbered]
+----
+Given(/(\S+) is hungry/) do |who|
+  @who = who
+end
+
+When(/she eats (\d+) cucumbers/) do |count|
+  @count = count
+end
+
+Then("she will be full") do
+  puts "#{@who} says:"\
+    " 'Thanks for #{@count} cucumbers'"
+end
+----
+|===
+
+<<<
+
+.*Вывод Cucumber*
+----
+Feature: Eating too many cucumbers may not be good for you
+  Eating too much of anything may not be good for you.
+
+  Scenario: Eating a few is no problem # features/one.feature:7
+    Given Alice is hungry              # features/step_definitions/she.rb:1
+    When she eats 3 cucumbers          # features/step_definitions/she.rb:5
+    Then she will be full              # features/step_definitions/she.rb:9
+      Alice says: 'Thanks for 3 cucumbers'
+
+1 scenario (1 passed)
+3 steps (3 passed)
+0m0.008s
+----
+
+.*Недостатки*
+- очень много текста
+
+.*Преимущества*
+- хорошая информативность
+- создан специально для документирования спецификаций (Gherkin) и проверки этих
+спецификаций программой (Реализации шагов)
+- существуют авто-генераторы документации, на пример https://relishapp.com/[RelishApp]
+
+== TDD
+
+*TDD* - test driven development - техника при которой сначала пишут тесты, как
+спецификацию будущего кода, а потом пишут код под эти тесты.
+
+Звучит великолепно но на практике сложно пользоваться. Нужен большой опыт.
+
+При таком подходе тест может писать не программист, а заказчик или руководитель.
+Такой тест будет заданием для программиста.
+
+Однако так может работать и сам программист. Это помогает организовать работу и
+не забывать то, что необходимо реализовать.
