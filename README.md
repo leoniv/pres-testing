@@ -8,6 +8,8 @@
 
 - Ruby >= 2.3 - `sudo apt-get install ruby`
 - JRE - `sudo apt-get install default-jre`
+- Rust - `curl https://sh.rustup.rs -sSf | sh && source $HOME/.cargo/env`
+- SvgBobRus - `cargo install svgbob_cli`
 - Gem bundler - `sudo gem install bundler`
 
 ### Получение и установка зависимостей
