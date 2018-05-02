@@ -29,5 +29,4 @@
 
 ## Релиз
 
-    $git push origin master
-    $git push origin gh-pages
+    $git commit -am 'vX.X' && git push origin master

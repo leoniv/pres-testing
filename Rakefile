@@ -3,13 +3,17 @@ require 'html-proofer'
 ASCIIDOCTOR_DECJS = './tmp/asciidoctor-deck.js'
 TEST_BUILD = './test_build'
 DECKJS_LINK = File.join(TEST_BUILD, 'deck.js')
-IMAGES_DIR = File.expand_path('../images', __FILE__)
-CUSTOM_CSS = File.expand_path('../css/custom.css', __FILE__)
+IMAGES_DIR = './images'
+IMAGES_DIR_LINK = File.join(TEST_BUILD, 'images')
+CUSTOM_CSS = './css/custom.css'
+CUSTOM_CSS_LINK = File.join(TEST_BUILD, 'css')
 
 def cook_test_env
   FileUtils.mkdir_p TEST_BUILD
   FileUtils.rm_rf(File.join(TEST_BUILD, '/*'));
   FileUtils.ln_s '../deck.js', TEST_BUILD  unless File.exist?(DECKJS_LINK)
+  FileUtils.ln_s '../images', TEST_BUILD  unless File.exist?(IMAGES_DIR_LINK)
+  FileUtils.ln_s '../css', TEST_BUILD  unless File.exist?(CUSTOM_CSS_LINK)
 end
 
 COMMON_ATTRIBUTES = {
