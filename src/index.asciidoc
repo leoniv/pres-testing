@@ -258,12 +258,11 @@ end
 <<<
 
 .*тест-дублеры*
-- *dumy* - используются только для только для заполнения параметров метода,
-обычно можно использовать любое значение но для наглядности лучше использовать
-`nil`
+- *dumy* - используются только для только для заполнения параметров метода.
+По сути, можно использовать любое значение (я обычно использую `nil`)
 - *fake* - реально реализованные объекты которые нельзя использовать в продакшн
-на пример наследники классов реальных объектов с "замоканными" или
-"застабленными" методами
+на пример реальные объекты с переопределенными методами, использование
+упрощенных СУБД таких как `sqlite` и т.п.
 - *stub* - чистый дублер - объект реализующий интерфейс реального объекта в той
 части на сколько это необходимо для теста и возвращающий заранее заготовленные
 значения
@@ -273,7 +272,7 @@ end
 
 <<<
 
-.Пример полной изоляции с использованием `mock` объекта
+.*Пример полной изоляции с использованием `dumy` и `stub`*
 [cols=2*a]
 |===
 |Код
@@ -292,25 +291,21 @@ class С
   end
 end
 ----
-|Тест метода `foo()` используется проверка поведения и проверка состояния
+|Тест метода `foo()` используется только проверка состояния
 [source, ruby, numbered]
 ----
 describe C do
   describe '#foo' do
     it 'when bzz == true' do
       bar = mock
-      bar.expects(:listen)
-        .with(:buzz).returns(:listen_result)
+      bar.stub(:listen => :listen_result)
       inst = C.new
-      inst.expects(:buzz).returns(:buzz)
+      inst.stub(:buzz => :buzz)
       inst.foo(bar).must_equal :listen_result
     end
 
     it 'when bzz == false' do
-      bar = mock
-      bar.expects(:listen).never
-      inst.expects(:buzz).never
-      inst.foo(bar, false).must_equal false
+      inst.foo(nil, false).must_equal false
     end
   end
 end
@@ -323,8 +318,8 @@ end
 - проверка состояния
 - проверка поведения
 
-.Проверка состояния
-Проверяется возвращаемые значения или состояние объекта.
+.*Проверка состояния*
+Проверяется возвращаемые значения или состояние объекта после вызова.
 
 Для проверки используются методы "ассертации" предоставляемые библиотеками
 тестирования. Проверка может быть позитивной и негативной. Самым ранним
@@ -333,8 +328,7 @@ end
 
 Имена методов зависят от библиотеки и используемой нотации.
 
-.Пример
-[sourse, ruby]
+[sourse, ruby, numbered]
 ----
 assert true, 'Упадет если подать false' <1>
 refute false, 'Упадет если подать true' <2>
@@ -348,10 +342,71 @@ refute_equal 'Expected', 'Actual', 'Ожидает Expected != Actual' <5>
 
 <<<
 
-.Проверка поведения
+.*Проверка поведения*
+Проверка поведения выполняется с помощью `mock` тест-дублеров и "замокиванием"
+контекста. Кроме того проверка поведения выполняется с помощью ассертаций
+ожидающих вызов исключения.
 
-FIXME ассертации, моки
+<<<
+
+.*Проверка поведения*
+[cols=2*a]
+|===
+|Код
+[source, ruby, numbered]
+----
+class С
+  def buzz
+    return 'buzz'
+  end
+
+  def foo(bar, bzz = :yes)
+    if bzz == :yes
+      return bar.listen(buzz)
+    elsif bzz == :no
+      return bzz
+    end
+
+    fail ArgumentError, "Invalid bzz: `#{bz}`"
+  end
+end
+----
+|Тест метода `foo()`
+[source, ruby, numbered]
+----
+describe C do
+  describe '#foo' do
+    it 'when bzz == :yes' do
+      bar = mock
+      bar.expects(:listen)
+        .with(:buzz).returns(:listen_result)
+      inst = C.new
+      inst.expects(:buzz).returns(:buzz)
+      inst.foo(bar).must_equal :listen_result
+    end
+
+    it 'when bzz == :no' do
+      bar = mock
+      bar.expects(:listen).never
+      inst.expects(:buzz).never
+      inst.foo(bar, :no).must_equal :no
+    end
+
+    it 'fail ArgumentError' do
+      bar = mock
+      bar.expects(:listen).never
+      inst.expects(:buzz).never
+      e = proc {
+        inst.foo(nil, :ivalid)
+      }.must_raise ArgumentError
+      e.message.must_match /Invalid bzz:/i
+    end
+  end
+end
+----
+|===
 
 == Нотации тестов
 
 FIXME test_ spec gerkin
+
