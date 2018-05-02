@@ -73,7 +73,9 @@ end
 
 desc 'Build project'
 task :build do |t|
-  fail 'FIXME'
+  all_asciidoc.each do |f|
+    lint build(f, './')
+  end
 end
 
 desc 'Test build for [file.asciidoc]'
