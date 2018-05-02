@@ -197,7 +197,7 @@ describe '#foo' do
   end
 
   it 'when a > 10' do
-    foo(11).must_equal '(5 .. 10]'
+    foo(11).must_equal '(10 .. )'
   end
 
   it 'when a == 10' do
