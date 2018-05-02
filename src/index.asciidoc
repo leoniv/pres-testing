@@ -232,15 +232,69 @@ end
 Однако всегда надо стараться использовать все граничные случаи т.к. они обычно
 считанные.
 
-== Slide FIXME
-
 == Изоляция и тест-дублеры
 
+.Изоляция кода
+
+Для классических модульных тестов предполагается, что код модуля полностью
+изолирован от внешнего окружения. Это позволяет:
+
+- разорвать зависимости от внешних объектов не предназначенных для тестирования
+- упростить настройку тестового окружения
+- вести параллельную разработку отдельных модулей договорившись об их интерфейсах
+
+*На практике это требование бывает сложно реализовать*.
 FIXME
 
-=== Пример полной изоляции
+.Изоляция тестов
 
 FIXME
+
+<<<
+
+.Пример полной изоляции с использованием `mock` объекта
+[cols=2*a]
+|===
+|Код
+[source, ruby, numbered]
+----
+class С
+  def buzz
+    return 'buzz'
+  end
+
+  def foo(bar, bzz = true)
+    if bzz
+      return bar.listen(buzz)
+    end
+    return bzz
+  end
+end
+----
+|Тест метода `foo()`
+[source, ruby, numbered]
+----
+describe C do
+  describe '#foo' do
+    it 'when bzz == true' do
+      bar = mock
+      bar.expects(:listen)
+        .with(:buzz).returns(:listen_result)
+      inst = C.new
+      inst.expects(:buzz).returns(:buzz)
+      inst.foo(bar).must_equal :listen_result
+    end
+
+    it 'when bzz == false' do
+      bar = mock
+      bar.expects(:listen).never
+      inst.expects(:buzz).never
+      inst.foo(bar, false).must_equal false
+    end
+  end
+end
+----
+|===
 
 == Проверка выполнения
 
