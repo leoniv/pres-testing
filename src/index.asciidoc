@@ -204,7 +204,7 @@ describe '#foo' do
     foo(10).must_equal '(5 .. 10]'
   end
 
-  it 'when 5 =< a < 10' do
+  it 'when 5 < a < 10' do
     foo(7).must_equal '(5 .. 10]'
   end
 end
