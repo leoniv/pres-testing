@@ -3,3 +3,4 @@ test_build/
 src/.asciidoctor/
 diag-*.png
 diag-*.svg
+Gemfile.lock
